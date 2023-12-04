@@ -16,7 +16,7 @@ public class Main {
     }
 
     private static void exercise1() throws IOException {
-        System.out.println("Solving Day 1 Challenge 1: ");
+        System.out.println("Solving Day 4 Challenge 1: ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
         File file = new File(classLoader.getResource("input.txt").getFile());
@@ -43,7 +43,7 @@ public class Main {
     }
 
     private static void exercise2() throws IOException {
-        System.out.println("Solving Day 1 Challenge 2: ");
+        System.out.println("Solving Day 4 Challenge 2: ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
         File file = new File(classLoader.getResource("input.txt").getFile());
