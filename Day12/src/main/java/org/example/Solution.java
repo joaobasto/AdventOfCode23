@@ -65,6 +65,14 @@ public class Solution {
         if(currentTotalPoints > finalTotalPoints) {
             return 0L;
         }
+        //we have less maximum possible points than the total points
+        long maximumTotalPoints = currentTotalPoints +
+                characters.subList(charactersIndex, characters.size()).stream()
+                        .filter(character -> character.equals('?') || character.equals('#'))
+                        .count();
+        if(maximumTotalPoints < finalTotalPoints) {
+            return 0L;
+        }
         //or our current sets will never be able to match the final sets
         if (!isMatchPossible(subsets, finalSubsets)) {
             return 0L;
@@ -85,13 +93,16 @@ public class Solution {
         List<Subset> newSolution1Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
         Solution newSolution1 = new Solution(newSolution1Characters, charactersIndex, newSolution1Subsets);
+        long value1 = newSolution1.solve(finalSubsets);
+
         List<Character> newSolution2Characters = new ArrayList<>(characters);
         newSolution2Characters.set(charactersIndex, '.');
         List<Subset> newSolution2Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
         Solution newSolution2 = new Solution(newSolution2Characters, charactersIndex, newSolution2Subsets);
+        long value2 = newSolution2.solve(finalSubsets);
 
-        return newSolution1.solve(finalSubsets) + newSolution2.solve(finalSubsets);
+        return value1 + value2;
     }
 
     private boolean isMatch(List<Subset> subsets, List<Subset> finalSubsets) {
