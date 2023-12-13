@@ -12,18 +12,21 @@ public class Solution {
     private int charactersIndex;
     private List<Subset> subsets;
 
-    private Map<Integer, Map<List<Subset>, Long>> solutionMap = new HashMap<>();
+    private Map<Integer, Map<List<Subset>, Long>> solutionMap;
 
     public Solution(List<Character> characters) {
         this.characters = characters;
         this.charactersIndex = 0;
         this.subsets = new ArrayList<>();
+        this.solutionMap = new HashMap<>();
     }
 
-    public Solution(List<Character> characters, int charactersIndex, List<Subset> subsets) {
+    public Solution(List<Character> characters, int charactersIndex, List<Subset> subsets,
+                    Map<Integer, Map<List<Subset>, Long>> solutionMap) {
         this.characters = characters;
         this.charactersIndex = charactersIndex;
         this.subsets = subsets;
+        this.solutionMap = solutionMap;
     }
 
     /**
@@ -110,14 +113,14 @@ public class Solution {
         newSolution1Characters.set(charactersIndex, '#');
         List<Subset> newSolution1Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        Solution newSolution1 = new Solution(newSolution1Characters, charactersIndex, newSolution1Subsets);
+        Solution newSolution1 = new Solution(newSolution1Characters, charactersIndex, newSolution1Subsets, solutionMap);
         long value1 = newSolution1.solve(finalSubsets);
 
         List<Character> newSolution2Characters = new ArrayList<>(characters);
         newSolution2Characters.set(charactersIndex, '.');
         List<Subset> newSolution2Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        Solution newSolution2 = new Solution(newSolution2Characters, charactersIndex, newSolution2Subsets);
+        Solution newSolution2 = new Solution(newSolution2Characters, charactersIndex, newSolution2Subsets, solutionMap);
         long value2 = newSolution2.solve(finalSubsets);
 
         return value1 + value2;
