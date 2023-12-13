@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         exercise1();
-        //exercise2();
+        exercise2();
     }
 
     private static void exercise1() throws IOException {

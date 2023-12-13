@@ -1,6 +1,8 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +11,8 @@ public class Solution {
     private List<Character> characters;
     private int charactersIndex;
     private List<Subset> subsets;
+
+    private Map<Integer, Map<List<Subset>, Long>> solutionMap = new HashMap<>();
 
     public Solution(List<Character> characters) {
         this.characters = characters;
@@ -57,12 +61,20 @@ public class Solution {
             subsets.get(subsets.size() - 1).setBounded(true);
         }
 
+        //check if we already have a solution for this point
+        if (solutionMap.get(charactersIndex) != null &&
+                solutionMap.get(charactersIndex).get(subsets) != null) {
+            return solutionMap.get(charactersIndex).get(subsets);
+        }
+
         //check if this is a terminal state:
         //unfeasible state:
         //we have more points than what is possible in total
         long currentTotalPoints = subsets.stream().mapToLong(Subset::getQuantity).sum();
         long finalTotalPoints = finalSubsets.stream().mapToLong(Subset::getQuantity).sum();
         if(currentTotalPoints > finalTotalPoints) {
+            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
+            solutionMap.get(charactersIndex).put(subsets, 0L);
             return 0L;
         }
         //we have less maximum possible points than the total points
@@ -75,13 +87,19 @@ public class Solution {
         }
         //or our current sets will never be able to match the final sets
         if (!isMatchPossible(subsets, finalSubsets)) {
+            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
+            solutionMap.get(charactersIndex).put(subsets, 0L);
             return 0L;
         }
         //or because it is a feasible solution (we reached the end of the characters
         //and we have the sets of points equal to the desired sets of points)
         if (charactersIndex == characters.size() && isMatch(subsets, finalSubsets)) {
+            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
+            solutionMap.get(charactersIndex).put(subsets, 1L);
             return 1L;
         } else if (charactersIndex == characters.size() && !isMatch(subsets, finalSubsets)) {
+            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
+            solutionMap.get(charactersIndex).put(subsets, 0L);
             return 0L;
         }
 

@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Objects;
+
 public class Subset {
 
     private long quantity;
@@ -33,5 +35,18 @@ public class Subset {
 
     public void increment() {
         this.quantity += 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Subset subset = (Subset) o;
+        return quantity == subset.quantity && bounded == subset.bounded;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(quantity, bounded);
     }
 }
