@@ -87,19 +87,18 @@ public class Solution {
         //the number of feasible solutions from this state is equal
         //to the number of feasible solutions if we put a '#' in the next point plus
         //the number of feasible solutions if we put a '.' in the next point
-        List<Character> newSolution1Characters = new ArrayList<>(characters);
-        newSolution1Characters.set(charactersIndex, '#');
+        characters.set(charactersIndex, '#');
         List<Subset> newSolution1Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        long value1 = Solution.solve(newSolution1Characters, charactersIndex,
+        long value1 = Solution.solve(characters, charactersIndex,
                 newSolution1Subsets, finalSubsets, solutionMap);
 
-        List<Character> newSolution2Characters = new ArrayList<>(characters);
-        newSolution2Characters.set(charactersIndex, '.');
+        characters.set(charactersIndex, '.');
         List<Subset> newSolution2Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        long value2 = Solution.solve(newSolution2Characters, charactersIndex,
+        long value2 = Solution.solve(characters, charactersIndex,
                 newSolution2Subsets, finalSubsets, solutionMap);
+        characters.set(charactersIndex, '?');
 
         return value1 + value2;
     }
