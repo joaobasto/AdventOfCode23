@@ -100,6 +100,7 @@ public class Solution {
                 newSolution2Subsets, finalSubsets, solutionMap);
         characters.set(charactersIndex, '?');
 
+        solutionMap.put(convertToMapKey(charactersIndex, subsets), value1 + value2);
         return value1 + value2;
     }
 
