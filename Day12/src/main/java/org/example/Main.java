@@ -34,7 +34,7 @@ public class Main {
                     .mapToObj(e->(char)e).collect(Collectors.toList());
             //obtain combinations
             numberOfCombinations += Solution.solve(characters,
-                    0, new ArrayList<>(), finalSubsets,
+                    finalSubsets,
                     new HashMap<>());
         }
 
@@ -45,7 +45,7 @@ public class Main {
         System.out.println("Solving Day 12 Challenge 2: ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
-        File file = new File(classLoader.getResource("input.txt").getFile());
+        File file = new File(classLoader.getResource("input2.txt").getFile());
 
         BufferedReader br
                 = new BufferedReader(new FileReader(file));
@@ -64,10 +64,9 @@ public class Main {
             List<Character> characters = lineData[0].chars()
                     .mapToObj(e->(char)e).collect(Collectors.toList());
             updateCharacters(characters);
-            Solution solution = new Solution();
             //obtain combinations
-            numberOfCombinations += solution.solve(characters,
-                    0, new ArrayList<>(), finalSubsets,
+            numberOfCombinations += Solution.solve(characters,
+                    finalSubsets,
                     new HashMap<>());
         }
 
@@ -87,7 +86,7 @@ public class Main {
     private static void updateFinalSubsets(List<Subset> finalSubsets) {
         int i = 0;
         while(i < finalSubsets.size()) {
-            for(int j = 0; j < 5; j++) {
+            for(int j = 0; j < 4; j++) {
                 finalSubsets.add(i + 1, new Subset(finalSubsets.get(i)));
             }
             i += 5;

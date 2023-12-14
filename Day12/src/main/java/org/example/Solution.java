@@ -12,10 +12,10 @@ public class Solution {
      * @return
      */
     public static long solve(List<Character> characters,
-                      int charactersIndex,
-                      List<Subset> subsets,
                       List<Subset> finalSubsets,
                       Map<String, Long> solutionMap) {
+        List<Subset> subsets = new ArrayList<>();
+        int charactersIndex = 0;
         //read and update data until next decision point
         while(!characters.get(charactersIndex).equals('?')) {
             //if it is a point, we get the last subset in our subsets (if such exists and is unbounded)
@@ -87,20 +87,15 @@ public class Solution {
         //the number of feasible solutions from this state is equal
         //to the number of feasible solutions if we put a '#' in the next point plus
         //the number of feasible solutions if we put a '.' in the next point
+        String mapKey = convertToMapKey(charactersIndex, subsets);
         characters.set(charactersIndex, '#');
-        List<Subset> newSolution1Subsets = subsets.stream()
-                .map(Subset::new).collect(Collectors.toList());
-        long value1 = Solution.solve(characters, charactersIndex,
-                newSolution1Subsets, finalSubsets, solutionMap);
+        long value1 = Solution.solve(characters, finalSubsets, solutionMap);
 
         characters.set(charactersIndex, '.');
-        List<Subset> newSolution2Subsets = subsets.stream()
-                .map(Subset::new).collect(Collectors.toList());
-        long value2 = Solution.solve(characters, charactersIndex,
-                newSolution2Subsets, finalSubsets, solutionMap);
+        long value2 = Solution.solve(characters, finalSubsets, solutionMap);
         characters.set(charactersIndex, '?');
 
-        solutionMap.put(convertToMapKey(charactersIndex, subsets), value1 + value2);
+        solutionMap.put(mapKey, value1 + value2);
         return value1 + value2;
     }
 
