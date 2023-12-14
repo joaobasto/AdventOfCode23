@@ -84,12 +84,11 @@ public class Main {
     }
 
     private static void updateFinalSubsets(List<Subset> finalSubsets) {
-        int i = 0;
-        while(i < finalSubsets.size()) {
-            for(int j = 0; j < 4; j++) {
-                finalSubsets.add(i + 1, new Subset(finalSubsets.get(i)));
+        int initialSize = finalSubsets.size();
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < initialSize; j++){
+                finalSubsets.add(new Subset(finalSubsets.get(j)));
             }
-            i += 5;
         }
     }
 }
