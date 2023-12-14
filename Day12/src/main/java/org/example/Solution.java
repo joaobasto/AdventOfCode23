@@ -12,7 +12,7 @@ public class Solution {
     private int charactersIndex;
     private List<Subset> subsets;
 
-    private Map<Integer, Map<List<Subset>, Long>> solutionMap;
+    private Map<String, Long> solutionMap;
 
     public Solution(List<Character> characters) {
         this.characters = characters;
@@ -22,7 +22,7 @@ public class Solution {
     }
 
     public Solution(List<Character> characters, int charactersIndex, List<Subset> subsets,
-                    Map<Integer, Map<List<Subset>, Long>> solutionMap) {
+                    Map<String, Long> solutionMap) {
         this.characters = characters;
         this.charactersIndex = charactersIndex;
         this.subsets = subsets;
@@ -65,9 +65,8 @@ public class Solution {
         }
 
         //check if we already have a solution for this point
-        if (solutionMap.get(charactersIndex) != null &&
-                solutionMap.get(charactersIndex).get(subsets) != null) {
-            return solutionMap.get(charactersIndex).get(subsets);
+        if (solutionMap.get(convertToMapKey(charactersIndex, subsets)) != null) {
+            return solutionMap.get(convertToMapKey(charactersIndex, subsets));
         }
 
         //check if this is a terminal state:
@@ -76,8 +75,7 @@ public class Solution {
         long currentTotalPoints = subsets.stream().mapToLong(Subset::getQuantity).sum();
         long finalTotalPoints = finalSubsets.stream().mapToLong(Subset::getQuantity).sum();
         if(currentTotalPoints > finalTotalPoints) {
-            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
-            solutionMap.get(charactersIndex).put(subsets, 0L);
+            solutionMap.put(convertToMapKey(charactersIndex, subsets), 0L);
             return 0L;
         }
         //we have less maximum possible points than the total points
@@ -86,23 +84,21 @@ public class Solution {
                         .filter(character -> character.equals('?') || character.equals('#'))
                         .count();
         if(maximumTotalPoints < finalTotalPoints) {
+            solutionMap.put(convertToMapKey(charactersIndex, subsets), 0L);
             return 0L;
         }
         //or our current sets will never be able to match the final sets
         if (!isMatchPossible(subsets, finalSubsets)) {
-            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
-            solutionMap.get(charactersIndex).put(subsets, 0L);
+            solutionMap.put(convertToMapKey(charactersIndex, subsets), 0L);
             return 0L;
         }
         //or because it is a feasible solution (we reached the end of the characters
         //and we have the sets of points equal to the desired sets of points)
         if (charactersIndex == characters.size() && isMatch(subsets, finalSubsets)) {
-            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
-            solutionMap.get(charactersIndex).put(subsets, 1L);
+            solutionMap.put(convertToMapKey(charactersIndex, subsets), 1L);
             return 1L;
         } else if (charactersIndex == characters.size() && !isMatch(subsets, finalSubsets)) {
-            solutionMap.computeIfAbsent(charactersIndex, unused -> new HashMap<>());
-            solutionMap.get(charactersIndex).put(subsets, 0L);
+            solutionMap.put(convertToMapKey(charactersIndex, subsets), 0L);
             return 0L;
         }
 
@@ -149,5 +145,19 @@ public class Solution {
         }
 
         return true;
+    }
+
+    private String convertToMapKey(Integer charactersIndex, List<Subset> subsets) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(String.valueOf(charactersIndex));
+        stringBuilder.append(":");
+        for(Subset subset : subsets) {
+            stringBuilder.append(String.valueOf(subset.getQuantity()));
+            stringBuilder.append(".");
+        }
+        if(!subsets.isEmpty() && !subsets.get(subsets.size() -1).isBounded()) {
+            stringBuilder.append("*");
+        }
+        return stringBuilder.toString();
     }
 }
