@@ -1,39 +1,21 @@
 package org.example;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Solution {
 
-    private List<Character> characters;
-    private int charactersIndex;
-    private List<Subset> subsets;
-
-    private Map<String, Long> solutionMap;
-
-    public Solution(List<Character> characters) {
-        this.characters = characters;
-        this.charactersIndex = 0;
-        this.subsets = new ArrayList<>();
-        this.solutionMap = new HashMap<>();
-    }
-
-    public Solution(List<Character> characters, int charactersIndex, List<Subset> subsets,
-                    Map<String, Long> solutionMap) {
-        this.characters = characters;
-        this.charactersIndex = charactersIndex;
-        this.subsets = subsets;
-        this.solutionMap = solutionMap;
-    }
-
     /**
      * Calculates number of feasible solutions that can be obtained.
      * @return
      */
-    public long solve(List<Subset> finalSubsets) {
+    public static long solve(List<Character> characters,
+                      int charactersIndex,
+                      List<Subset> subsets,
+                      List<Subset> finalSubsets,
+                      Map<String, Long> solutionMap) {
         //read and update data until next decision point
         while(!characters.get(charactersIndex).equals('?')) {
             //if it is a point, we get the last subset in our subsets (if such exists and is unbounded)
@@ -109,20 +91,20 @@ public class Solution {
         newSolution1Characters.set(charactersIndex, '#');
         List<Subset> newSolution1Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        Solution newSolution1 = new Solution(newSolution1Characters, charactersIndex, newSolution1Subsets, solutionMap);
-        long value1 = newSolution1.solve(finalSubsets);
+        long value1 = Solution.solve(newSolution1Characters, charactersIndex,
+                newSolution1Subsets, finalSubsets, solutionMap);
 
         List<Character> newSolution2Characters = new ArrayList<>(characters);
         newSolution2Characters.set(charactersIndex, '.');
         List<Subset> newSolution2Subsets = subsets.stream()
                 .map(Subset::new).collect(Collectors.toList());
-        Solution newSolution2 = new Solution(newSolution2Characters, charactersIndex, newSolution2Subsets, solutionMap);
-        long value2 = newSolution2.solve(finalSubsets);
+        long value2 = Solution.solve(newSolution2Characters, charactersIndex,
+                newSolution2Subsets, finalSubsets, solutionMap);
 
         return value1 + value2;
     }
 
-    private boolean isMatch(List<Subset> subsets, List<Subset> finalSubsets) {
+    private static boolean isMatch(List<Subset> subsets, List<Subset> finalSubsets) {
         if(subsets.size() != finalSubsets.size()) {
             return false;
         }
@@ -134,7 +116,7 @@ public class Solution {
         return true;
     }
 
-    private boolean isMatchPossible(List<Subset> subsets, List<Subset> finalSubsets) {
+    private static boolean isMatchPossible(List<Subset> subsets, List<Subset> finalSubsets) {
         for (int i = 0; i < subsets.size(); i++) {
             if(!subsets.get(i).isBounded()) {
                 break;
@@ -147,7 +129,7 @@ public class Solution {
         return true;
     }
 
-    private String convertToMapKey(Integer charactersIndex, List<Subset> subsets) {
+    private static String convertToMapKey(Integer charactersIndex, List<Subset> subsets) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.valueOf(charactersIndex));
         stringBuilder.append(":");

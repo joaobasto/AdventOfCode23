@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         exercise1();
-        exercise2();
+        //exercise2();
     }
 
     private static void exercise1() throws IOException {
@@ -30,10 +30,12 @@ public class Main {
                     .mapToLong(Long::valueOf)
                     .forEach(number -> finalSubsets.add(new Subset(number, true)));
             //create solution to be updated
-            Solution solution = new Solution(lineData[0].chars()
-                    .mapToObj(e->(char)e).collect(Collectors.toList()));
+            List<Character> characters = lineData[0].chars()
+                    .mapToObj(e->(char)e).collect(Collectors.toList());
             //obtain combinations
-            numberOfCombinations += solution.solve(finalSubsets);
+            numberOfCombinations += Solution.solve(characters,
+                    0, new ArrayList<>(), finalSubsets,
+                    new HashMap<>());
         }
 
         System.out.println("The sum of number of combinations is: " + numberOfCombinations);
@@ -62,9 +64,11 @@ public class Main {
             List<Character> characters = lineData[0].chars()
                     .mapToObj(e->(char)e).collect(Collectors.toList());
             updateCharacters(characters);
-            Solution solution = new Solution(characters);
+            Solution solution = new Solution();
             //obtain combinations
-            numberOfCombinations += solution.solve(finalSubsets);
+            numberOfCombinations += solution.solve(characters,
+                    0, new ArrayList<>(), finalSubsets,
+                    new HashMap<>());
         }
 
         System.out.println("The sum of number of combinations is: " + numberOfCombinations);
