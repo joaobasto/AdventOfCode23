@@ -45,7 +45,7 @@ public class Main {
         System.out.println("Solving Day 12 Challenge 2: ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
-        File file = new File(classLoader.getResource("input2.txt").getFile());
+        File file = new File(classLoader.getResource("input.txt").getFile());
 
         BufferedReader br
                 = new BufferedReader(new FileReader(file));
@@ -85,7 +85,7 @@ public class Main {
 
     private static void updateFinalSubsets(List<Subset> finalSubsets) {
         int initialSize = finalSubsets.size();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             for (int j = 0; j < initialSize; j++){
                 finalSubsets.add(new Subset(finalSubsets.get(j)));
             }
