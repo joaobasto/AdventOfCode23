@@ -49,6 +49,13 @@ public class Main {
         System.out.println("The total load is: " + load);
     }
 
+    //This solution takes a very long time to run
+    //To solve this, I didn't actually run this to the end
+    //I run the program long enough to see a pattern on how the load evolves
+    //Let's say that this pattern has a period of P
+    //Then I took an iteration step i and established that the pattern's first position was the position in step i
+    //Then we calculate the difference between step 999999999 and i, and check the remainder of the division by P
+    //This will give us the step in P that the final position will be in
     private static void exercise2() throws IOException {
         System.out.println("Solving Day 14 Challenge 2: ");
 
@@ -96,14 +103,29 @@ public class Main {
             moveRocksWest(elementsByColumn, elementsByLine);
             moveRocksSouth(elementsByColumn, elementsByLine, blueprint.size());
             moveRocksEast(elementsByColumn, elementsByLine, blueprint.get(0).size());
-            if(i % 1000 == 0)
-                System.out.println(i);
+
+            //debugging prints used to calculate the solution by the method indicated in the comment
+            //before this method
+            if(i % 1 == 0) {
+                long load = 0L;
+                for (Element element : elements) {
+                    if (element.getElementType() == ElementType.ROUNDED_ROCK) {
+                        load += blueprint.size() - element.getX();
+                    }
+                }
+
+                System.out.println("(" + i + ", "+ load + ")");
+                int offset = (1000000000-1-885)%44;
+                System.out.println("Offset: " + offset);
+            }
         }
 
         //calculate load
         long load = 0L;
         for (Element element : elements) {
-            load += blueprint.size() - element.getX();
+            if (element.getElementType() == ElementType.ROUNDED_ROCK) {
+                load += blueprint.size() - element.getX();
+            }
         }
 
         System.out.println("The total load is: " + load);
