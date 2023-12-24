@@ -19,7 +19,7 @@ public class Main {
     }
 
     private static void exercise1() throws IOException {
-        System.out.println("Solving Day 16 Challenge 1: ");
+        System.out.println("Solving Day 17 Challenge 1: ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
         File file = new File(classLoader.getResource("input.txt").getFile());
