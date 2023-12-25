@@ -212,6 +212,8 @@ public class Main {
         if(consecutiveSteps < 4 && consecutiveSteps > 0) {
             directions = new ArrayList<>();
             directions.add(currentDirection);
+        } else if(consecutiveSteps > 9) {
+            directions.remove(currentDirection);
         }
         //map boundaries
         if (i == 0) {
@@ -283,7 +285,7 @@ public class Main {
         Map<State, Direction> policyMap = new HashMap<>();
         for (int i = 0; i < numberOfLines; i++) {
             for (int j = 0; j < numberOfColumns; j++) {
-                for (int consecutiveSteps = 1; consecutiveSteps <= 4; consecutiveSteps++) {
+                for (int consecutiveSteps = 1; consecutiveSteps <= 10; consecutiveSteps++) {
                     for (Direction direction : getAvailableDirectionsFrom(i, j, numberOfLines, numberOfColumns)) {
                         State state = new State(new Position(i, j), direction, consecutiveSteps);
                         valueMap.put(state, randomGenerator.nextInt(4));
@@ -316,10 +318,8 @@ public class Main {
                         continue;
                     }
                     int consecutiveSteps;
-                    if(direction == state.getDirection() && state.getConsecutiveSteps() < 4) {
+                    if(direction == state.getDirection()) {
                         consecutiveSteps = state.getConsecutiveSteps() + 1;
-                    } else if (direction == state.getDirection() && state.getConsecutiveSteps() == 4) {
-                        consecutiveSteps = 4;
                     } else {
                         consecutiveSteps = 1;
                     }
@@ -345,10 +345,8 @@ public class Main {
                 for (Direction direction : availableDirections) {
                     Position newPosition = state.getPosition().getPositionAfterMove(direction);
                     int consecutiveSteps;
-                    if(direction == state.getDirection() && state.getConsecutiveSteps() < 4) {
+                    if(direction == state.getDirection()) {
                         consecutiveSteps = state.getConsecutiveSteps() + 1;
-                    } else if (direction == state.getDirection() && state.getConsecutiveSteps() == 4) {
-                        consecutiveSteps = 4;
                     } else {
                         consecutiveSteps = 1;
                     }
