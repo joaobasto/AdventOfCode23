@@ -20,6 +20,18 @@ public enum Direction {
         if (directionString.equals("D")) {
             return DOWN;
         }
+        if (directionString.equals("0")) {
+            return RIGHT;
+        }
+        if (directionString.equals("1")) {
+            return DOWN;
+        }
+        if (directionString.equals("2")) {
+            return LEFT;
+        }
+        if (directionString.equals("3")) {
+            return UP;
+        }
         return null;
     }
 }

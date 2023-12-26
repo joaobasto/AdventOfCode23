@@ -8,30 +8,30 @@ import static org.example.Direction.*;
 
 public class Node {
 
-    private int x;
-    private int y;
+    private long x;
+    private long y;
     private CurveType curveType;
     private List<Node> connectedNodes;
 
-    public Node(int x, int y) {
+    public Node(long x, long y) {
         this.x = x;
         this.y = y;
         connectedNodes = new ArrayList<>();
     }
 
-    public int getX() {
+    public long getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(long x) {
         this.x = x;
     }
 
-    public int getY() {
+    public long getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(long y) {
         this.y = y;
     }
 
@@ -64,7 +64,7 @@ public class Node {
         return Objects.hash(x, y);
     }
 
-    public Node getNodeAfterMove(Direction direction, int numberOfSteps) {
+    public Node getNodeAfterMove(Direction direction, long numberOfSteps) {
         if(direction == LEFT) {
             return new Node(this.getX(), this.getY() - numberOfSteps);
         }

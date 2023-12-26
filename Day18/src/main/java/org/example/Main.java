@@ -10,12 +10,12 @@ public class Main {
     private static final String finalNodeName = "ZZZ";
 
     public static void main(String[] args) throws IOException {
-        exercise1();
-        //exercise2();
+        solver(1);
+        solver(2);
     }
 
-    private static void exercise1() throws IOException {
-        System.out.println("Solving Day 18 Challenge 1: ");
+    private static void solver(int exerciseNumber) throws IOException {
+        System.out.println("Solving Day 8 Challenge " + exerciseNumber +": ");
 
         ClassLoader classLoader = Main.class.getClassLoader();
         File file = new File(classLoader.getResource("input.txt").getFile());
@@ -31,9 +31,18 @@ public class Main {
         nodes.add(currentNode);
         String line;
         while ((line = br.readLine()) != null) {
-            String[] lineData = line.split(" ");
-            Direction direction = Direction.getDirectionFromString(lineData[0]);
-            int steps = Integer.parseInt(lineData[1]);
+            String[] lineData;
+            Direction direction = null;
+            long steps = 0;
+            if (exerciseNumber == 1) {
+                lineData = line.split(" ");
+                direction = Direction.getDirectionFromString(lineData[0]);
+                steps = Integer.parseInt(lineData[1]);
+            } else if (exerciseNumber == 2) {
+                lineData = line.split(" \\(#")[1].split("\\)");
+                direction = Direction.getDirectionFromString(lineData[0].substring(lineData[0].length()-1));
+                steps = Long.parseLong(lineData[0].substring(0, lineData[0].length()-1), 16);
+            }
             Node newNode = currentNode.getNodeAfterMove(direction, steps);
             nodes.add(newNode);
             if(newNode.getX() == 0 && newNode.getY() == 0) {
@@ -50,51 +59,25 @@ public class Main {
         }
 
         //offset correction
-        int offsetX = nodes.stream()
+        long offsetX = nodes.stream()
                 .map(Node::getX)
-                .min(Comparator.comparingInt(a -> a))
+                .min(Comparator.comparingLong(a -> a))
                 .get();
-        int offsetY = nodes.stream()
+        long offsetY = nodes.stream()
                 .map(Node::getY)
-                .min(Comparator.comparingInt(a -> a))
+                .min(Comparator.comparingLong(a -> a))
                 .get();
         nodes.forEach(node -> node.setX(node.getX() - offsetX));
         nodes.forEach(node -> node.setY(node.getY() - offsetY));
 
-        int numberOfLines = nodes.stream()
+        long numberOfLines = nodes.stream()
                 .map(Node::getX)
-                .max(Comparator.comparingInt(a -> a))
+                .max(Comparator.comparingLong(a -> a))
                 .get() + 1;
-        int numberOfColumns = nodes.stream()
+        long numberOfColumns = nodes.stream()
                 .map(Node::getY)
-                .max(Comparator.comparingInt(a -> a))
+                .max(Comparator.comparingLong(a -> a))
                 .get() + 1;
-        List<List<Character>> map = new ArrayList<>();
-        for(int i = 0; i < numberOfLines; i++) {
-            map.add(new ArrayList<>());
-            for(int j = 0; j < numberOfColumns; j++) {
-                map.get(i).add('.');
-            }
-        }
-        for(Edge edge : horizontalEdges) {
-            int x = edge.getMaxX();
-            int minY = edge.getMinY();
-            int maxY = edge.getMaxY();
-            for(int i = minY; i <= maxY; i++) {
-                map.get(x).set(i, '#');
-            }
-        }
-        for(Edge edge : verticalEdges) {
-            int y = edge.getMaxY();
-            int minX = edge.getMinX();
-            int maxX = edge.getMaxX();
-            for(int i = minX; i <= maxX; i++) {
-                map.get(i).set(y, '#');
-            }
-        }
-
-        //Printing map to check if it looks correct
-        printMap(map);
 
         //set curve type for each node
         for(Node node : nodes) {
@@ -102,75 +85,105 @@ public class Main {
         }
 
         //generate map for nodes
-        Map<Integer, Map<Integer, Node>> nodeMap = new HashMap<>();
+        TreeMap<Long, TreeMap<Long, Node>> nodeMap = new TreeMap<>();
         for(Node node : nodes) {
-            nodeMap.computeIfAbsent(node.getX(), unused -> new HashMap<>());
+            nodeMap.computeIfAbsent(node.getX(), unused -> new TreeMap<>());
             nodeMap.get(node.getX()).put(node.getY(), node);
         }
 
         //Now, we basically have to solve something similar to Day10, where we
         //checked the number of positions inside the loop
-        int tilesInLoop = 0;
-        int tilesInBorder = 0;
-        for (int i = 0; i < map.size(); i++) {
+        //But we have to improve the performance for this one. So, we do the following:
+        //The tiles inside the loop and in the border for a given row only change if
+        //that row has nodes. So, we use the node tree map to quickly navigate to nodes,
+        //and in between node-changing rows, we just need to multiply the tiles in the starting row range
+        //by the number of rows in that range
+        long totalDiffY = 0;
+        long rowIndex = 0;
+        long previousRowIndex = 0;
+        long result = 0;
+        long squaresInsideLoop = 0;
+        long squaresInBorder = 0;
+        TreeMap<Long, NodeStatus> currentNodesByColumnIndex = new TreeMap<>();
+        for(Map.Entry<Long, TreeMap<Long, Node>> entry : nodeMap.entrySet()) {
+
+            long auxBorder = 0;
+            long auxInside = 0;
+            boolean inside = false;
+            NodeStatus previousNodeStatus = null;
+            for(Map.Entry<Long, NodeStatus> entry2 : currentNodesByColumnIndex.entrySet()) {
+                if (entry2.getValue().isInCurrentRow()) {
+                    continue;
+                }
+                NodeStatus nodeStatus = entry2.getValue();
+                auxBorder++;
+                inside = !inside;
+                if (!inside) {
+                    auxInside += nodeStatus.getNode().getY() - previousNodeStatus.getNode().getY() - 1;
+                }
+                previousNodeStatus = nodeStatus;
+            }
+            rowIndex = entry.getKey();
+            result += ((auxInside + auxBorder) *  (rowIndex - previousRowIndex - 1));
+            totalDiffY = 0;
+            previousRowIndex = rowIndex;
+
+            for(Map.Entry<Long, Node> entry1 : entry.getValue().entrySet()) {
+                currentNodesByColumnIndex.put(entry1.getKey(), new NodeStatus(entry1.getValue(), true));
+            }
+
+            List<NodeStatus> rowNodeStatus = currentNodesByColumnIndex.entrySet().stream()
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toList());
             boolean isInsideLoop = false;
+            boolean isInBorder = false;
             CurveType previousCurve = null;
-            for (int j = 0; j < map.get(i).size(); j++) {
-                if (map.get(i).get(j).equals('#')) {
-                    tilesInBorder++;
-                }
-                Node node = null;
-                CurveType curveType;
-                //check if it is a node and get curveType
-                if (nodeMap.get(i) != null && nodeMap.get(i).get(j) != null) {
-                    node = nodeMap.get(i).get(j);
-                    //get node type
-                    curveType = node.getCurveType();
-                    if (curveType.invertsState(previousCurve)) {
-                        isInsideLoop = !isInsideLoop;
-                    }
-                    previousCurve = curveType;
-                } else if (map.get(i).get(j).equals('.') &&
-                        j > 0 && map.get(i).get(j-1).equals('#')
-                && (nodeMap.get(i) == null || nodeMap.get(i).get(j - 1) == null)) {
+            Node previousStartNode = null;
+            for(NodeStatus nodeStatus : rowNodeStatus) {
+                if (!nodeStatus.isInCurrentRow()) {
                     isInsideLoop = !isInsideLoop;
-                    if(isInsideLoop) {
-                        tilesInLoop++;
+                    if (!isInsideLoop) {
+                        squaresInsideLoop += nodeStatus.getNode().getY() - previousStartNode.getY() - 1;
+                        squaresInBorder++;
                     }
-                } else if(isInsideLoop && map.get(i).get(j).equals('.')) {
-                    tilesInLoop++;
+                    if (isInsideLoop) {
+                        previousStartNode = nodeStatus.getNode();
+                        squaresInBorder++;
+                    }
+                    previousCurve = CurveType.VERTICAL;
+                    previousStartNode = nodeStatus.getNode();
+                    continue;
+                }
+                //get node type
+                CurveType curveType = nodeStatus.getNode().getCurveType();
+                if (isInBorder && curveType.exitsBorder()) {
+                    squaresInBorder += nodeStatus.getNode().getY() - previousStartNode.getY() + 1;
+                }
+                if (!isInBorder && curveType.entersBorder() && isInsideLoop) {
+                    squaresInsideLoop += nodeStatus.getNode().getY() - previousStartNode.getY() - 1;
+                }
+                isInBorder = (isInBorder || curveType.entersBorder()) && !curveType.exitsBorder();
+                if (curveType.invertsStateRow(previousCurve)) {
+                    isInsideLoop = !isInsideLoop;
+                    if (!isInsideLoop) {
+                        totalDiffY += nodeStatus.getNode().getY() - previousStartNode.getY() + 1;
+                    }
+                }
+                previousCurve = curveType;
+                previousStartNode = nodeStatus.getNode();
+            }
+            for(Iterator<Map.Entry<Long, NodeStatus>> it = currentNodesByColumnIndex.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Long, NodeStatus> entry1 = it.next();
+                if(entry1.getValue().getNode().getCurveType() == CurveType.UP_LEFT ||
+                        entry1.getValue().getNode().getCurveType() == CurveType.UP_RIGHT) {
+                    it.remove();
+                } else {
+                    entry1.getValue().setInCurrentRow(false);
                 }
             }
         }
+        result = result + squaresInBorder + squaresInsideLoop;
 
-        System.out.println("Total available cubic meters are: " + (tilesInBorder + tilesInLoop));
-    }
-
-    private static void printMap(List<List<Character>> map) {
-        for(List<Character> characters: map) {
-            StringBuilder builder = new StringBuilder(characters.size());
-            for(Character ch: characters)
-            {
-                builder.append(ch);
-            }
-            System.out.println(builder);
-        }
-    }
-
-    private static void exercise2() throws IOException {
-        System.out.println("Solving Day 8 Challenge 2: ");
-
-        ClassLoader classLoader = Main.class.getClassLoader();
-        File file = new File(classLoader.getResource("input.txt").getFile());
-
-        BufferedReader br
-                = new BufferedReader(new FileReader(file));
-
-        String line;
-        br.readLine();
-
-        while ((line = br.readLine()) != null) {
-            String[] lineData = line.split(" = \\(");
-        }
+        System.out.println("Total available cubic meters are: " + (result));
     }
 }

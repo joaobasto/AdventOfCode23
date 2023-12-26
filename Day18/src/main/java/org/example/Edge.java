@@ -28,19 +28,19 @@ public class Edge {
         this.node2 = node2;
     }
 
-    public int getMinX() {
+    public long getMinX() {
         return Math.min(node1.getX(), node2.getX());
     }
 
-    public int getMinY() {
+    public long getMinY() {
         return Math.min(node1.getY(), node2.getY());
     }
 
-    public int getMaxX() {
+    public long getMaxX() {
         return Math.max(node1.getX(), node2.getX());
     }
 
-    public int getMaxY() {
+    public long getMaxY() {
         return Math.max(node1.getY(), node2.getY());
     }
 
