@@ -1,5 +1,9 @@
 package org.example;
 
+import javax.swing.text.html.Option;
+import java.util.Map;
+import java.util.Optional;
+
 public class Step {
 
     /** label that will be tested in this step
@@ -35,6 +39,20 @@ public class Step {
         } else {
             return part.getCharacteristics().get(label) > value;
         }
+    }
+
+    public Optional<Map<String, Range>> getValidRange(Map<String, Range> inputRanges) {
+        return RangeUtils.getOutputRanges(inputRanges, label, value, conditionType);
+    }
+
+    public Optional<Map<String, Range>> getInvalidRange(Map<String, Range> inputRanges) {
+        if(conditionType == ConditionType.LESS_THAN) {
+            return RangeUtils.getOutputRanges(inputRanges, label, value - 1, ConditionType.GREATER_THAN);
+        }
+        if(conditionType == ConditionType.GREATER_THAN) {
+            return RangeUtils.getOutputRanges(inputRanges, label, value + 1, ConditionType.LESS_THAN);
+        }
+        return Optional.empty();
     }
 
     public String getLabel() {
