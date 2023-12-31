@@ -8,8 +8,8 @@ public class Conjunction extends Module{
 
     private Map<Module, Boolean> pulseByInputModule;
 
-    public Conjunction(SimulationEngine simulationEngine, String[] destinationModulesNames) {
-        super(simulationEngine, destinationModulesNames);
+    public Conjunction(String name, SimulationEngine simulationEngine, String[] destinationModulesNames) {
+        super(name, simulationEngine, destinationModulesNames);
         pulseByInputModule = new HashMap<>();
     }
 
@@ -37,5 +37,12 @@ public class Conjunction extends Module{
                 }
             }
         }
+    }
+
+    public void printPulseByInput() {
+        for(Map.Entry<Module, Boolean> entry : pulseByInputModule.entrySet()) {
+            System.out.print(entry.getKey().name + " - " + entry.getValue() + " ");
+        }
+        System.out.print("\n");
     }
 }

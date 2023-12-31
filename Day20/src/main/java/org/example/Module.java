@@ -5,12 +5,14 @@ import java.util.List;
 
 public abstract class Module {
 
+    String name;
     List<Module> inputModules;
     List<Module> destinationModules;
     SimulationEngine simulationEngine;
     String[] destinationModulesNames;
 
-    public Module(SimulationEngine simulationEngine, String[] destinationModulesNames) {
+    public Module(String name, SimulationEngine simulationEngine, String[] destinationModulesNames) {
+        this.name = name;
         inputModules = new ArrayList<>();
         destinationModules = new ArrayList<>();
         this.simulationEngine = simulationEngine;

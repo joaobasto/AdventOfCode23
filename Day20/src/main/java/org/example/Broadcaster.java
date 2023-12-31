@@ -2,8 +2,8 @@ package org.example;
 
 public class Broadcaster extends Module {
 
-    public Broadcaster(SimulationEngine simulationEngine, String[] destinationModulesNames) {
-        super(simulationEngine, destinationModulesNames);
+    public Broadcaster(String name, SimulationEngine simulationEngine, String[] destinationModulesNames) {
+        super(name, simulationEngine, destinationModulesNames);
     }
     @Override
     public void handleEvent(Event event) {

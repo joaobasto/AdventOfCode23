@@ -4,8 +4,8 @@ public class FlipFlop extends Module{
 
     boolean state;
 
-    public FlipFlop(SimulationEngine simulationEngine, String[] destinationModulesNames) {
-        super(simulationEngine, destinationModulesNames);
+    public FlipFlop(String name, SimulationEngine simulationEngine, String[] destinationModulesNames) {
+        super(name, simulationEngine, destinationModulesNames);
         state = false;
     }
 

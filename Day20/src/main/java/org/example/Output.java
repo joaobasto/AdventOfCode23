@@ -2,8 +2,8 @@ package org.example;
 
 public class Output extends Module{
 
-    public Output(SimulationEngine simulationEngine, String[] destinationModulesNames) {
-        super(simulationEngine, destinationModulesNames);
+    public Output(String name, SimulationEngine simulationEngine, String[] destinationModulesNames) {
+        super(name, simulationEngine, destinationModulesNames);
     }
 
     @Override
