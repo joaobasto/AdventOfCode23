@@ -330,13 +330,14 @@ public class Main {
             for(int j = 1*131; j < 1*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
+                    countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
                     //so we can just take the result divided by 2
                     if(countNode % 2 == 0) {
                         countNode = countNode/2;
                     } else {
                         //if the first value that will appear is odd, it means we will have one more odd than even
-                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance() + 131)%2 == 1) {
+                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance())%2 == 1) {
                             //given that we are interested in the odd values we add plus one to the division by 2
                             countNode = countNode/2 + 1;
                         } else {
@@ -353,13 +354,14 @@ public class Main {
             for(int j = 1*131; j < 1*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
+                    countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
                     //so we can just take the result divided by 2
                     if(countNode % 2 == 0) {
                         countNode = countNode/2;
                     } else {
                         //if the first value that will appear is odd, it means we will have one more odd than even
-                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance() + 131)%2 == 1) {
+                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance())%2 == 1) {
                             //given that we are interested in the odd values we add plus one to the division by 2
                             countNode = countNode/2 + 1;
                         } else {
@@ -376,13 +378,14 @@ public class Main {
             for(int j = 0*131; j < 0*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
+                    countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
                     //so we can just take the result divided by 2
                     if(countNode % 2 == 0) {
                         countNode = countNode/2;
                     } else {
                         //if the first value that will appear is odd, it means we will have one more odd than even
-                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance() + 131)%2 == 1) {
+                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance())%2 == 1) {
                             //given that we are interested in the odd values we add plus one to the division by 2
                             countNode = countNode/2 + 1;
                         } else {
@@ -399,13 +402,14 @@ public class Main {
             for(int j = 2*131; j < 2*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
+                    countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
                     //so we can just take the result divided by 2
                     if(countNode % 2 == 0) {
                         countNode = countNode/2;
                     } else {
                         //if the first value that will appear is odd, it means we will have one more odd than even
-                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance() + 131)%2 == 1) {
+                        if ((nodeByPosition.get(new Position(i, j)).getTentativeDistance())%2 == 1) {
                             //given that we are interested in the odd values we add plus one to the division by 2
                             countNode = countNode/2 + 1;
                         } else {
