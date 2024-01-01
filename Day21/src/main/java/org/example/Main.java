@@ -81,7 +81,6 @@ public class Main {
                 if (unvisitedQueue.contains(neighborNode)) {
                     int newTentativeDistance = currentNode.getTentativeDistance() + 1;
                     if (newTentativeDistance < neighborNode.getTentativeDistance()) {
-                        neighborNode.setTentativeDistance(newTentativeDistance);
                         changedDistanceNodes.add(neighborNode);
                     }
                 }
@@ -89,6 +88,7 @@ public class Main {
             //remove and insert changed distance nodes to keep them in a sorted position in the tree set
             for (Node node : changedDistanceNodes) {
                 unvisitedQueue.remove(node);
+                node.setTentativeDistance(currentNode.getTentativeDistance() + 1);
                 unvisitedQueue.add(node);
             }
             validNodeCount++;
@@ -118,10 +118,95 @@ public class Main {
         BufferedReader br
                 = new BufferedReader(new FileReader(file));
 
+        Map<Position, Node> nodeByPosition = new HashMap<>();
+        Node startNode = null;
         String line;
+        int lineIndex = 0;
         while ((line = br.readLine()) != null) {
-
+            String line2 = new String(new char[3]).replace("\0", line).replace('S', '.');
+            line = line.concat(line2);
+            char[] chars = line.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (chars[i] == '.') {
+                    nodeByPosition.put(new Position(lineIndex, i), new Node(lineIndex, i));
+                }
+                if (chars[i] == 'S') {
+                    nodeByPosition.put(new Position(lineIndex, i), new Node(lineIndex, i, 0));
+                    startNode = nodeByPosition.get(new Position(lineIndex, i));
+                }
+            }
+            lineIndex++;
         }
+
+        //now we must create the connections between the nodes
+        for(Node node : nodeByPosition.values()) {
+            //north
+            if (nodeByPosition.get(new Position(node.getX() - 1, node.getY())) != null) {
+                node.addNeighbor(nodeByPosition.get(new Position(node.getX() - 1, node.getY())));
+            }
+            //south
+            if (nodeByPosition.get(new Position(node.getX() + 1, node.getY())) != null) {
+                node.addNeighbor(nodeByPosition.get(new Position(node.getX() + 1, node.getY())));
+            }
+            //east
+            if (nodeByPosition.get(new Position(node.getX(), node.getY() + 1)) != null) {
+                node.addNeighbor(nodeByPosition.get(new Position(node.getX(), node.getY() + 1)));
+            }
+            //west
+            if (nodeByPosition.get(new Position(node.getX(), node.getY() - 1)) != null) {
+                node.addNeighbor(nodeByPosition.get(new Position(node.getX(), node.getY() - 1)));
+            }
+        }
+
+        //Dijsktra algorithm
+        long validNodeCount = 0;
+        Set<Node> validSet = new HashSet<>();
+        Comparator<Node> nodeComparator = new Comparator<Node>()
+        {
+            @Override
+            public int compare(Node n1, Node n2)
+            {
+                return n1.getTentativeDistance() - n2.getTentativeDistance();
+            }
+        };
+        PriorityQueue<Node> unvisitedQueue = new PriorityQueue<>(nodeComparator);
+        unvisitedQueue.addAll(nodeByPosition.values());
+        while (true) {
+            Node currentNode = unvisitedQueue.poll();
+            if (currentNode.getTentativeDistance() == Integer.MAX_VALUE) {
+                break;
+            }
+            Set<Node> changedDistanceNodes = new HashSet<>();
+            for (Node neighborNode : currentNode.getNeighbors()) {
+                if (unvisitedQueue.contains(neighborNode)) {
+                    int newTentativeDistance = currentNode.getTentativeDistance() + 1;
+                    if (newTentativeDistance < neighborNode.getTentativeDistance()) {
+                        changedDistanceNodes.add(neighborNode);
+                    }
+                }
+            }
+            //remove and insert changed distance nodes to keep them in a sorted position in the tree set
+            for (Node node : changedDistanceNodes) {
+                unvisitedQueue.remove(node);
+                node.setTentativeDistance(currentNode.getTentativeDistance() + 1);
+                unvisitedQueue.add(node);
+            }
+            validNodeCount++;
+            validSet.add(currentNode);
+            if (unvisitedQueue.isEmpty()) {
+                break;
+            }
+        }
+
+        //nodes that are in an odd distance are impossible to reach at an even ammount of steps
+        //so we remove them from the count
+        for(Node node : validSet) {
+            if (node.getTentativeDistance() % 2 == 1) {
+                validNodeCount--;
+            }
+        }
+
+        System.out.println("Valid node count is: " + validNodeCount);
     }
 
 
