@@ -202,7 +202,7 @@ public class Main {
         unvisitedQueue.addAll(nodeByPosition.values());
         while (true) {
             Node currentNode = unvisitedQueue.poll();
-            if (currentNode.getTentativeDistance() == maxSteps) {
+            if (currentNode.getTentativeDistance() > maxSteps) {
                 break;
             }
             Set<Node> changedDistanceNodes = new HashSet<>();
@@ -252,13 +252,15 @@ public class Main {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
+                    boolean isCountNodeOdd = countNode%2 == 1;
                     long actualCountNode = 0L;
 
                     for(int k = 1; k <= countNode; k++) {
                         if(k%2==0) {
                             actualCountNode += k/2;
                         } else {
-                            actualCountNode += startsOdd ? k/2 + 1 : k/2;
+                            actualCountNode +=
+                                    ((startsOdd && isCountNodeOdd) || (!startsOdd && !isCountNodeOdd)) ? k/2 + 1 : k/2;
                         }
                     }
                     countNodes += actualCountNode;
@@ -272,13 +274,15 @@ public class Main {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
+                    boolean isCountNodeOdd = countNode%2 == 1;
                     long actualCountNode = 0L;
 
                     for(int k = 1; k <= countNode; k++) {
                         if(k%2==0) {
                             actualCountNode += k/2;
                         } else {
-                            actualCountNode += startsOdd ? k/2 + 1 : k/2;
+                            actualCountNode +=
+                                    ((startsOdd && isCountNodeOdd) || (!startsOdd && !isCountNodeOdd)) ? k/2 + 1 : k/2;
                         }
                     }
                     countNodes += actualCountNode;
@@ -292,13 +296,15 @@ public class Main {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
+                    boolean isCountNodeOdd = countNode%2 == 1;
                     long actualCountNode = 0L;
 
                     for(int k = 1; k <= countNode; k++) {
                         if(k%2==0) {
                             actualCountNode += k/2;
                         } else {
-                            actualCountNode += startsOdd ? k/2 + 1 : k/2;
+                            actualCountNode +=
+                                    ((startsOdd && isCountNodeOdd) || (!startsOdd && !isCountNodeOdd)) ? k/2 + 1 : k/2;
                         }
                     }
                     countNodes += actualCountNode;
@@ -312,13 +318,15 @@ public class Main {
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
+                    boolean isCountNodeOdd = countNode%2 == 1;
                     long actualCountNode = 0L;
 
                     for(int k = 1; k <= countNode; k++) {
                         if(k%2==0) {
                             actualCountNode += k/2;
                         } else {
-                            actualCountNode += startsOdd ? k/2 + 1 : k/2;
+                            actualCountNode +=
+                                    ((startsOdd && isCountNodeOdd) || (!startsOdd && !isCountNodeOdd)) ? k/2 + 1 : k/2;
                         }
                     }
                     countNodes += actualCountNode;
