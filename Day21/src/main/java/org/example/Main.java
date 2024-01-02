@@ -249,6 +249,9 @@ public class Main {
         for(int i = 0*131; i < 0*131 + 131; i++) {
             for(int j = 0*131; j < 0*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
@@ -271,6 +274,9 @@ public class Main {
         for(int i = 2*131; i < 2*131 + 131; i++) {
             for(int j = 0*131; j < 0*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
@@ -293,6 +299,9 @@ public class Main {
         for(int i = 0*131; i < 0*131 + 131; i++) {
             for(int j = 2*131; j < 2*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
@@ -315,6 +324,9 @@ public class Main {
         for(int i = 2*131; i < 2*131 + 131; i++) {
             for(int j = 2*131; j < 2*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     boolean startsOdd = nodeByPosition.get(new Position(i, j)).getTentativeDistance()%2 == 1;
@@ -337,6 +349,9 @@ public class Main {
         for(int i = 0*131; i < 0*131 + 131; i++) {
             for(int j = 1*131; j < 1*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
@@ -361,6 +376,9 @@ public class Main {
         for(int i = 2*131; i < 2*131 + 131; i++) {
             for(int j = 1*131; j < 1*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
@@ -385,6 +403,9 @@ public class Main {
         for(int i = 1*131; i < 1*131 + 131; i++) {
             for(int j = 0*131; j < 0*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
@@ -409,6 +430,9 @@ public class Main {
         for(int i = 1*131; i < 1*131 + 131; i++) {
             for(int j = 2*131; j < 2*131 + 131; j++) {
                 if(nodeByPosition.get(new Position(i, j)) != null) {
+                    if(!validSet.contains(nodeByPosition.get(new Position(i, j)))) {
+                        continue;
+                    }
                     long countNode = (maxSteps - nodeByPosition.get(new Position(i, j)).getTentativeDistance())/131;
                     countNode++;
                     //if countNode is even it means that the same ammount of even and odd distances will appear,
