@@ -35,7 +35,7 @@ public class Main {
         long countIntersections = 0;
         for (int i = 0; i < hailstones.size(); i++) {
             for(int j = i +1; j < hailstones.size(); j++) {
-                if(intersectInRange(hailstones.get(i), hailstones.get(j), 7, 27)) {
+                if(intersectInRange(hailstones.get(i), hailstones.get(j), 200000000000000D, 400000000000000D)) {
                     countIntersections++;
                 }
             }
@@ -63,7 +63,8 @@ public class Main {
                 double intersectX = hailstone1.posX + k1 * hailstone1.velX;
                 double intersectY = hailstone1.posY + k1 * hailstone1.velY;
                 if(intersectX >= min && intersectX <= max && intersectY >= min && intersectY <= max) {
-                    return true;
+                    double k2 = (hailstone1.posX + k1 * hailstone1.velX - hailstone2.posX)/hailstone2.velX;
+                    return k1>=0 && k2>=0;
                 }
                 else {
                     return false;
@@ -85,7 +86,8 @@ public class Main {
         double intersectX = hailstone2.posX + k2 * hailstone2.velX;
         double intersectY = hailstone2.posY + k2 * hailstone2.velY;
         if(intersectX >= min && intersectX <= max && intersectY >= min && intersectY <= max) {
-            return true;
+            double k1 = (hailstone2.posX + k2 * hailstone2.velX - hailstone1.posX)/hailstone1.velX;
+            return k1>=0 && k2>=0;
         }
         else {
             return false;
