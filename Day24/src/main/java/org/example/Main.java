@@ -1,5 +1,7 @@
 package org.example;
 
+import Jama.Matrix;
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,10 +99,16 @@ public class Main {
     //I tried to create a system of equations to solve this, matching the position of the rock with 3 stones.
     //Given that we have 3 dimensions, this gives us 9 equations. And 9 unknown variables (position and velocity
     //dimensions of the stone and the three collision times).
-    //The problem is that the equations are non-linear. So I implemented an approximate solver for the system of equations.
-    //Basically, I wrote the equations placing 0 on one side of the equation and  determine the gradients
-    //of the error in each equation in function of the variables, to know how to iteratively move.
-    //It is an implementation of the Gradient Descent Algorithm.
+    //The problem is that the equations are non-linear.
+    //By re-arranging the 3 equations of the first hailstone with t on the LHS and the rest of the RHS, and then
+    //transforming them to RHS of each equation must be equal to the other, we get non-linear equation on
+    //velocity in an axis multiplied by position in another. But we can do this process for multiple hailstones,
+    //and then when we sum the equations of two hailstones together the non-linear terms will cancel each other.
+    //And we will have linear equations, with four unknown variables (speed and position in two dimensions).
+    //We need to do the equation for 4 different pairs of hailstones to have the solution.
+    //Written below is just the equations that I got from solving the system by hand to obtain the variables.
+    //I used a lib called JAMA (https://math.nist.gov/javanumerics/jama/) that I found online
+    //to have a linear equation system solver.
     private static void exercise2() throws IOException {
         System.out.println("Solving Day 24 Challenge 2: ");
 
@@ -122,94 +130,91 @@ public class Main {
             hailstones.add(hailstone);
         }
 
-        //get an initial estimation of the rock position and velocity and time collisions
-        //it will hold the average of the values for all hailstones, so that it is in an initial position
-        //close to the real one. Initial times will be velocity also because I am guessing they will be of
-        //the same order of magnitude
-        Solution rock = getInitialSolution(hailstones);
+        /*
+        double[][] array = {{1.,2.,3},{4.,5.,6.},{7.,8.,10.}};
+        Matrix A = new Matrix(array);
+        Matrix b = Matrix.random(3,1);
+        Matrix x = A.solve(b);
+        Matrix Residual = A.times(x).minus(b);
+        double rnorm = Residual.normInf();
+         */
 
-        Double error = Double.MAX_VALUE;
+        //this system will give us posX, posY, velX, velY
+        Hailstone hailstone1 = hailstones.get(0);
+        Hailstone hailstone2 = hailstones.get(1);
+        Hailstone hailstone3 = hailstones.get(2);
+        Hailstone hailstone4 = hailstones.get(3);
+        Hailstone hailstone5 = hailstones.get(4);
 
-        Double learningStep = 0.0001D;
-        //while the error is bigger than a very small value
-        while (error > 0.05) {
-            Double previousError = error;
-            //get the error for the 9 equations and sum it
-            Double error1 = Math.pow(rock.posX + rock.t1 * rock.velX - hailstones.get(0).posX - rock.t1 * hailstones.get(0).velX, 2D);
-            Double error2 = Math.pow(rock.posY + rock.t1 * rock.velY - hailstones.get(0).posY - rock.t1 * hailstones.get(0).velY, 2D);
-            Double error3 = Math.pow(rock.posZ + rock.t1 * rock.velZ - hailstones.get(0).posZ - rock.t1 * hailstones.get(0).velZ, 2D);
-            Double error4 = Math.pow(rock.posX + rock.t2 * rock.velX - hailstones.get(1).posX - rock.t2 * hailstones.get(1).velX, 2D);
-            Double error5 = Math.pow(rock.posY + rock.t2 * rock.velY - hailstones.get(1).posY - rock.t2 * hailstones.get(1).velY, 2D);
-            Double error6 = Math.pow(rock.posZ + rock.t2 * rock.velZ - hailstones.get(1).posZ - rock.t2 * hailstones.get(1).velZ, 2D);
-            Double error7 = Math.pow(rock.posX + rock.t3 * rock.velX - hailstones.get(2).posX - rock.t3 * hailstones.get(2).velX, 2D);
-            Double error8 = Math.pow(rock.posY + rock.t3 * rock.velY - hailstones.get(2).posY - rock.t3 * hailstones.get(2).velY, 2D);
-            Double error9 = Math.pow(rock.posZ + rock.t3 * rock.velZ - hailstones.get(2).posZ - rock.t3 * hailstones.get(2).velZ, 2D);
-            error = error1 + error2 + error3 + error4 + error5 + error6 + error7 + error8 + error9;
+        double[][] coefficients = {{
+            (hailstone1.velY - hailstone2.velY),
+            (hailstone2.velX - hailstone1.velX),
+            (hailstone2.posY - hailstone1.posY),
+            (hailstone1.posX - hailstone2.posX)},{
+            (hailstone2.velY - hailstone3.velY),
+            (hailstone3.velX - hailstone2.velX),
+            (hailstone3.posY - hailstone2.posY),
+            (hailstone2.posX - hailstone3.posX)},{
+            (hailstone3.velY - hailstone4.velY),
+            (hailstone4.velX - hailstone3.velX),
+            (hailstone4.posY - hailstone3.posY),
+            (hailstone3.posX - hailstone4.posX)},{
+            (hailstone4.velY - hailstone5.velY),
+            (hailstone5.velX - hailstone4.velX),
+            (hailstone5.posY - hailstone4.posY),
+            (hailstone4.posX - hailstone5.posX)}};
 
-            if (error > previousError) {
-                break;
-            }
+        double[][] bValues = {{
+                (hailstone1.velY * hailstone1.posX - hailstone1.velX * hailstone1.posY - hailstone2.velY * hailstone2.posX + hailstone2.velX * hailstone2.posY)},{
+                (hailstone2.velY * hailstone2.posX - hailstone2.velX * hailstone2.posY - hailstone3.velY * hailstone3.posX + hailstone3.velX * hailstone3.posY)},{
+                (hailstone3.velY * hailstone3.posX - hailstone3.velX * hailstone3.posY - hailstone4.velY * hailstone4.posX + hailstone4.velX * hailstone4.posY)},{
+                (hailstone4.velY * hailstone4.posX - hailstone4.velX * hailstone4.posY - hailstone5.velY * hailstone5.posX + hailstone5.velX * hailstone5.posY)}};
 
-            //calculate the gradient for each of the 9 variables
-            Double gradPosX = 2 * (rock.posX + rock.t1 * rock.velX - hailstones.get(0).posX - rock.t1 * hailstones.get(0).velX) * 1 +
-                    2 * (rock.posX + rock.t2 * rock.velX - hailstones.get(1).posX - rock.t2 * hailstones.get(1).velX) * 1 +
-                    2 * (rock.posX + rock.t3 * rock.velX - hailstones.get(2).posX - rock.t3 * hailstones.get(2).velX) * 1;
-            Double gradPosY = 2 * (rock.posY + rock.t1 * rock.velY - hailstones.get(0).posY - rock.t1 * hailstones.get(0).velY) * 1 +
-                    2 * (rock.posY + rock.t2 * rock.velY - hailstones.get(1).posY - rock.t2 * hailstones.get(1).velY) * 1 +
-                    2 * (rock.posY + rock.t3 * rock.velY - hailstones.get(2).posY - rock.t3 * hailstones.get(2).velY) * 1;
-            Double gradPosZ = 2 * (rock.posZ + rock.t1 * rock.velZ - hailstones.get(0).posZ - rock.t1 * hailstones.get(0).velZ) * 1 +
-                    2 * (rock.posZ + rock.t2 * rock.velZ - hailstones.get(1).posZ - rock.t2 * hailstones.get(1).velZ) * 1 +
-                    2 * (rock.posZ + rock.t3 * rock.velZ - hailstones.get(2).posZ - rock.t3 * hailstones.get(2).velZ) * 1;
-            Double gradVelX = 2 * (rock.posX + rock.t1 * rock.velX - hailstones.get(0).posX - rock.t1 * hailstones.get(0).velX) * rock.t1 +
-                    2 * (rock.posX + rock.t2 * rock.velX - hailstones.get(1).posX - rock.t2 * hailstones.get(1).velX) * rock.t2 +
-                    2 * (rock.posX + rock.t3 * rock.velX - hailstones.get(2).posX - rock.t3 * hailstones.get(2).velX) * rock.t3;
-            Double gradVelY = 2 * (rock.posY + rock.t1 * rock.velY - hailstones.get(0).posY - rock.t1 * hailstones.get(0).velY) * rock.t1 +
-                    2 * (rock.posY + rock.t2 * rock.velY - hailstones.get(1).posY - rock.t2 * hailstones.get(1).velY) * rock.t2 +
-                    2 * (rock.posY + rock.t3 * rock.velY - hailstones.get(2).posY - rock.t3 * hailstones.get(2).velY) * rock.t3;
-            Double gradVelZ = 2 * (rock.posZ + rock.t1 * rock.velZ - hailstones.get(0).posZ - rock.t1 * hailstones.get(0).velZ) * rock.t1 +
-                    2 * (rock.posZ + rock.t2 * rock.velZ - hailstones.get(1).posZ - rock.t2 * hailstones.get(1).velZ) * rock.t2 +
-                    2 * (rock.posZ + rock.t3 * rock.velZ - hailstones.get(2).posZ - rock.t3 * hailstones.get(2).velZ) * rock.t3;
-            Double gradT1 = 2 * (rock.posX + rock.t1 * rock.velX - hailstones.get(0).posX - rock.t1 * hailstones.get(0).velX) * (rock.velX - hailstones.get(0).velX) +
-                    2 * (rock.posY + rock.t1 * rock.velY - hailstones.get(0).posY - rock.t1 * hailstones.get(0).velY) * (rock.velY - hailstones.get(0).velY) +
-                    2 * (rock.posZ + rock.t1 * rock.velZ - hailstones.get(0).posZ - rock.t1 * hailstones.get(0).velZ) * (rock.velZ - hailstones.get(0).velZ);
-            Double gradT2 = 2 * (rock.posX + rock.t2 * rock.velX - hailstones.get(1).posX - rock.t2 * hailstones.get(1).velX) * (rock.velX - hailstones.get(1).velX) +
-                    2 * (rock.posY + rock.t2 * rock.velY - hailstones.get(1).posY - rock.t2 * hailstones.get(1).velY) * (rock.velY - hailstones.get(1).velY) +
-                    2 * (rock.posZ + rock.t2 * rock.velZ - hailstones.get(1).posZ - rock.t2 * hailstones.get(1).velZ) * (rock.velZ - hailstones.get(1).velZ);
-            Double gradT3 = 2 * (rock.posX + rock.t3 * rock.velX - hailstones.get(2).posX - rock.t3 * hailstones.get(2).velX) * (rock.velX - hailstones.get(2).velX) +
-                    2 * (rock.posY + rock.t3 * rock.velY - hailstones.get(2).posY - rock.t3 * hailstones.get(2).velY) * (rock.velY - hailstones.get(2).velY) +
-                    2 * (rock.posZ + rock.t3 * rock.velZ - hailstones.get(2).posZ - rock.t3 * hailstones.get(2).velZ) * (rock.velZ - hailstones.get(2).velZ);
+        Matrix A = new Matrix(coefficients);
+        Matrix b = new Matrix(bValues);
+        Matrix x = A.solve(b);
+        int debug = 1;
+        double posX = x.get(0,0);
+        double posY = x.get(1, 0);
+        double velX = x.get(2, 0);
+        double velY = x.get(3, 0);
 
-            //update the variables
-            rock.posX = rock.posX - learningStep * gradPosX;
-            rock.posY = rock.posY - learningStep * gradPosY;
-            rock.posZ = rock.posZ - learningStep * gradPosZ;
-            rock.velX = rock.velX - learningStep * gradVelX;
-            rock.velY = rock.velY - learningStep * gradVelY;
-            rock.velZ = rock.velZ - learningStep * gradVelZ;
-            rock.t1 = rock.t1 - learningStep * gradT1;
-            rock.t2 = rock.t2 - learningStep * gradT2;
-            rock.t3 = rock.t3 - learningStep * gradT3;
+        //now I will solve another still to get the position and velocity for Z, we could use the values we already
+        //have to create a simpler equation system. But this code runs fast so no need to have extra work creating the equations
+        //for that.
 
-            System.out.println("Current error is: " + error);
-        }
+        double[][] coefficients2 = {{
+                (hailstone1.velZ - hailstone2.velZ),
+                (hailstone2.velY - hailstone1.velY),
+                (hailstone2.posZ - hailstone1.posZ),
+                (hailstone1.posY - hailstone2.posY)},{
+                (hailstone2.velZ - hailstone3.velZ),
+                (hailstone3.velY - hailstone2.velY),
+                (hailstone3.posZ - hailstone2.posZ),
+                (hailstone2.posY - hailstone3.posY)},{
+                (hailstone3.velZ - hailstone4.velZ),
+                (hailstone4.velY - hailstone3.velY),
+                (hailstone4.posZ - hailstone3.posZ),
+                (hailstone3.posY - hailstone4.posY)},{
+                (hailstone4.velZ - hailstone5.velZ),
+                (hailstone5.velY - hailstone4.velY),
+                (hailstone5.posZ - hailstone4.posZ),
+                (hailstone4.posY - hailstone5.posY)}};
 
-    }
+        double[][] bValues2 = {{
+                (hailstone1.velZ * hailstone1.posY - hailstone1.velY * hailstone1.posZ - hailstone2.velZ * hailstone2.posY + hailstone2.velY * hailstone2.posZ)},{
+                (hailstone2.velZ * hailstone2.posY - hailstone2.velY * hailstone2.posZ - hailstone3.velZ * hailstone3.posY + hailstone3.velY * hailstone3.posZ)},{
+                (hailstone3.velZ * hailstone3.posY - hailstone3.velY * hailstone3.posZ - hailstone4.velZ * hailstone4.posY + hailstone4.velY * hailstone4.posZ)},{
+                (hailstone4.velZ * hailstone4.posY - hailstone4.velY * hailstone4.posZ - hailstone5.velZ * hailstone5.posY + hailstone5.velY * hailstone5.posZ)}};
 
-    private static Solution getInitialSolution(List<Hailstone> hailstones) {
-        double posX = hailstones.stream().map(hailstone -> hailstone.posX).reduce(0D, Double::sum);
-        posX = posX/ hailstones.size();
-        double posY = hailstones.stream().map(hailstone -> hailstone.posY).reduce(0D, Double::sum);
-        posY = posY/ hailstones.size();
-        double posZ = hailstones.stream().map(hailstone -> hailstone.posZ).reduce(0D, Double::sum);
-        posZ = posZ/ hailstones.size();
-        double velX = hailstones.stream().map(hailstone -> hailstone.velX).reduce(0D, Double::sum);
-        velX = velX/ hailstones.size();
-        double velY = hailstones.stream().map(hailstone -> hailstone.velY).reduce(0D, Double::sum);
-        velY = velY/ hailstones.size();
-        double velZ = hailstones.stream().map(hailstone -> hailstone.velZ).reduce(0D, Double::sum);
-        velZ = velZ/ hailstones.size();
+        Matrix A2 = new Matrix(coefficients2);
+        Matrix b2 = new Matrix(bValues2);
+        Matrix x2 = A2.solve(b2);
+        double posZ = x2.get(1, 0);
+        double velZ = x2.get(3, 0);
 
-        return new Solution(posX,posY,posZ,velX,velY,velZ,velX, velY, velZ);
+        double sum = posX + posY + posZ;
+        System.out.printf("Sum of initial coordinates of the rock is: %f\n", sum);
     }
 
 
