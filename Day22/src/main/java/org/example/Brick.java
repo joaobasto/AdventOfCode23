@@ -1,7 +1,9 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Brick {
 
@@ -12,7 +14,7 @@ public class Brick {
     long posZMin;
     long posZMax;
 
-    List<Brick> supportingBricks = new ArrayList<>();
+    Set<Brick> supportingBricks = new HashSet<>();
 
     public Brick(long posXMin, long posYMin, long posZMin, long posXMax, long posYMax, long posZMax) {
         this.posXMin = posXMin;

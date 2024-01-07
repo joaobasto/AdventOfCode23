@@ -41,14 +41,14 @@ public class Main {
             Brick nextBrick = priorityQueue.poll();
             //get max height along all positions and which bricks have it
             long maxHeight = 0;
-            List<Brick> maxHeightBricks = new ArrayList<>();
+            Set<Brick> maxHeightBricks = new HashSet<>();
             for (long i = nextBrick.posXMin; i <= nextBrick.posXMax; i++) {
                 for (long j = nextBrick.posYMin; j <= nextBrick.posYMax; j++) {
                     PositionData positionData = positions
                             .compute(new Position(i, j), (k, v) -> v == null ? new PositionData() : v);
                     if (positionData.currentHeight > maxHeight) {
                         maxHeight = positionData.currentHeight;
-                        maxHeightBricks.clear();
+                        maxHeightBricks = new HashSet<>();
                         maxHeightBricks.add(positionData.currentHeighestBrick);
                     } else if (positionData.currentHeight == maxHeight) {
                         if (positionData.currentHeighestBrick != null) {
@@ -74,7 +74,7 @@ public class Main {
         //remove from the set all bricks that are the single supporting brick of another brick
         for(Brick brick : bricks) {
             if (brick.supportingBricks.size() == 1) {
-                safeToDisintegrateBricks.remove(brick.supportingBricks.get(0));
+                safeToDisintegrateBricks.remove(brick.supportingBricks.stream().findFirst().get());
             }
         }
 
