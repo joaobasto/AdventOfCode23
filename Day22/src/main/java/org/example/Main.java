@@ -91,8 +91,84 @@ public class Main {
         BufferedReader br
                 = new BufferedReader(new FileReader(file));
 
+        //reading brick information
+        List<Brick> bricks = new ArrayList<>();
         String line;
         while ((line = br.readLine()) != null) {
+            String[] positions = line.split(",|~");
+            bricks.add(new Brick(Long.parseLong(positions[0]), Long.parseLong(positions[1]), Long.parseLong(positions[2]),
+                    Long.parseLong(positions[3]), Long.parseLong(positions[4]), Long.parseLong(positions[5])));
         }
+
+        //sorting the bricks in a priority queue by their min-z value
+        PriorityQueue<Brick> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(brick -> (int) brick.posZMin));
+        priorityQueue.addAll(bricks);
+
+        //create a set to hold each XY position as well as its data
+        Map<Position, PositionData> positions = new HashMap<>();
+
+        //let the bricks fall one by one and update the both the position map with the current heigh and current highest brick
+        //as well as the supporting bricks for the falling brick
+        while (!priorityQueue.isEmpty()) {
+            Brick nextBrick = priorityQueue.poll();
+            //get max height along all positions and which bricks have it
+            long maxHeight = 0;
+            Set<Brick> maxHeightBricks = new HashSet<>();
+            for (long i = nextBrick.posXMin; i <= nextBrick.posXMax; i++) {
+                for (long j = nextBrick.posYMin; j <= nextBrick.posYMax; j++) {
+                    PositionData positionData = positions
+                            .compute(new Position(i, j), (k, v) -> v == null ? new PositionData() : v);
+                    if (positionData.currentHeight > maxHeight) {
+                        maxHeight = positionData.currentHeight;
+                        maxHeightBricks = new HashSet<>();
+                        maxHeightBricks.add(positionData.currentHeighestBrick);
+                    } else if (positionData.currentHeight == maxHeight) {
+                        if (positionData.currentHeighestBrick != null) {
+                            maxHeightBricks.add(positionData.currentHeighestBrick);
+                        }
+                    }
+                }
+            }
+            //update this brick's supporting bricks
+            nextBrick.supportingBricks.addAll(maxHeightBricks);
+            for (Brick maxHeightBrick : maxHeightBricks) {
+                maxHeightBrick.supportedBricks.add(nextBrick);
+            }
+            //update the height and current highest brick of the positions this brick will fall into
+            for (long i = nextBrick.posXMin; i <= nextBrick.posXMax; i++) {
+                for (long j = nextBrick.posYMin; j <= nextBrick.posYMax; j++) {
+                    PositionData positionData = positions.get(new Position(i, j));
+                    positionData.currentHeight = maxHeight + (nextBrick.posZMax - nextBrick.posZMin + 1);
+                    positionData.currentHeighestBrick = nextBrick;
+                }
+            }
+        }
+
+        long count = 0;
+        for(Brick brick : bricks) {
+            //reset state
+            for(Brick brick2 : bricks) {
+                brick2.isRemoved = false;
+            }
+            Set<Brick> nodes = new HashSet<>();
+            nodes.add(brick);
+            Set<Brick> fallingNodes = new HashSet<>();
+            while(!nodes.isEmpty()) {
+                //get first node in the list and set it as removed
+                Brick node = nodes.stream().findFirst().get();
+                node.isRemoved = true;
+                //evaluate this node and get next nodes
+                for(Brick supportedBrick : node.supportedBricks) {
+                    if(supportedBrick.supportingBricks.stream().allMatch(brick2 -> brick2.isRemoved)) {
+                        fallingNodes.add(supportedBrick);
+                        nodes.add(supportedBrick);
+                    }
+                }
+                nodes.remove(node);
+            }
+            count += fallingNodes.size();
+        }
+
+        System.out.println("Total count is: " + count);
     }
 }

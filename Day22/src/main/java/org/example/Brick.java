@@ -15,6 +15,9 @@ public class Brick {
     long posZMax;
 
     Set<Brick> supportingBricks = new HashSet<>();
+    Set<Brick> supportedBricks = new HashSet<>();
+
+    boolean isRemoved = false;
 
     public Brick(long posXMin, long posYMin, long posZMin, long posXMax, long posYMax, long posZMax) {
         this.posXMin = posXMin;
