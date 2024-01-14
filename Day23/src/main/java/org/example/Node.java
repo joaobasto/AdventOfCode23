@@ -8,10 +8,7 @@ public class Node {
     long x;
     long y;
     char type;
-    List<Node> predecessorNodes = new ArrayList<>();
-    List<Node> successorNodes = new ArrayList<>();
-
-    long distance = 0;
+    List<Edge> edges = new ArrayList<>();
 
     public Node(long x, long y, char type) {
         this.x = x;

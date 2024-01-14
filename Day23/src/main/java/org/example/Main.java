@@ -67,21 +67,59 @@ public class Main {
             rowIter++;
         }
 
-        long result = getMaximumDistance(nodeByPosition.get(new Position(0, 1)), new HashSet<>(), nodeByPosition,
+        //create edges
+        for(Node node : nodeByPosition.values()) {
+            for(Position position : node.getNeighborPositions()) {
+                if (nodeByPosition.get(position) != null) {
+                    node.edges.add(new Edge(nodeByPosition.get(position), 1L));
+                }
+            }
+        }
+
+        //compact edges
+        for(Node node : nodeByPosition.values()) {
+            if(node.edges.size()==2) {
+                Node firstNode = node.edges.get(0).edgeNode;
+                Node secondNode = node.edges.get(1).edgeNode;
+                //replace edges to this node
+                for(Edge edge : firstNode.edges) {
+                    if (edge.edgeNode == node) {
+                        edge.edgeNode = secondNode;
+                        edge.edgeDistance = edge.edgeDistance + node.edges.get(1).edgeDistance;
+                    }
+                }
+                for(Edge edge : secondNode.edges) {
+                    if (edge.edgeNode == node) {
+                        edge.edgeNode = firstNode;
+                        edge.edgeDistance = edge.edgeDistance + node.edges.get(0).edgeDistance;
+                    }
+                }
+                node.edges.clear();
+            }
+        }
+
+        Set<Node> compactedNodes = new HashSet<>();
+        for(Node node : nodeByPosition.values()) {
+            if (node.edges.isEmpty()) {
+                continue;
+            }
+            compactedNodes.add(node);
+        }
+
+        long result = getMaximumDistance(nodeByPosition.get(new Position(0, 1)), new HashSet<>(),
                 nodeByPosition.get(new Position(rowIter - 1, numberOfColumns - 2)));
-        result = result - 1;
 
         System.out.println("Maximum distance to exit is: " + result);
     }
 
 
-    public static long getMaximumDistance(Node currentNode, Set<Node> visitedNodes, Map<Position, Node> nodeByPosition, Node finalNode) {
+    public static long getMaximumDistance(Node currentNode, Set<Node> visitedNodes, Node finalNode) {
 
         //get possible new nodes
         Set<Node> validNeighbors = new HashSet<>();
-        for(Position position : currentNode.getNeighborPositions()) {
-            if (nodeByPosition.get(position) != null && !visitedNodes.contains(nodeByPosition.get(position))) {
-                validNeighbors.add(nodeByPosition.get(position));
+        for(Edge edge : currentNode.edges) {
+            if(!visitedNodes.contains(edge.edgeNode)) {
+                validNeighbors.add(edge.edgeNode);
             }
         }
 
@@ -94,38 +132,20 @@ public class Main {
             }
         }
 
-        long tempDistance = 1;
         Set<Node> newVisitedNodes = new HashSet<>(visitedNodes);
         newVisitedNodes.add(currentNode);
-        //handle case of only one neighbor
-        if (validNeighbors.size() == 1) {
-            Node newNode = null;
-            while(validNeighbors.size() == 1) {
-                tempDistance++;
-                newNode = validNeighbors.stream().findFirst().get();
-                newVisitedNodes.add(newNode);
-                //get possible new nodes
-                validNeighbors = new HashSet<>();
-                for(Position position : newNode.getNeighborPositions()) {
-                    if (nodeByPosition.get(position) != null && !newVisitedNodes.contains(nodeByPosition.get(position))) {
-                        validNeighbors.add(nodeByPosition.get(position));
-                    }
-                }
-            }
-            //handle terminal case of no validNeighbors
-            if (validNeighbors.isEmpty()) {
-                if(newNode == finalNode){
-                    return tempDistance;
-                } else {
-                    return -1000000000;
-                }
-            }
-        }
+
 
         long maxDistance = 0;
         boolean isFirst = true;
         for(Node neighbor : validNeighbors) {
-            long distance = getMaximumDistance(neighbor, newVisitedNodes, nodeByPosition, finalNode);
+            long distance = getMaximumDistance(neighbor, newVisitedNodes, finalNode);
+            for(Edge edge : neighbor.edges) {
+                if(edge.edgeNode == currentNode) {
+                    distance = distance + edge.edgeDistance;
+                    break;
+                }
+            }
             if(distance > maxDistance || isFirst) {
                 maxDistance = distance;
             }
@@ -133,7 +153,7 @@ public class Main {
                 isFirst = false;
             }
         }
-        return maxDistance + tempDistance;
+        return maxDistance;
     }
 
     public static long getMaximumDistanceSloped(Node currentNode, Set<Node> visitedNodes, Map<Position, Node> nodeByPosition, Node finalNode) {
